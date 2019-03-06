@@ -14,6 +14,8 @@
 
 <br>
 
+### Don't forget to support the lib by giving a ⭐️
+
 ## How to install
 
 ### CocoaPods
