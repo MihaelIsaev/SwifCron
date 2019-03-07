@@ -18,8 +18,14 @@ struct Helper {
     }
     
     /// Returns a next day by provided day of week, offset, minute, hour, minutem day, month, year, calendar
-    static func getNextDateByDow(_ dow: Int, available: [Int], dowOffset: Int, hour: Int, minute: Int, day: Int, month: Int, year: Int, calendar: Calendar) throws -> Date {
+    static func getNextDateByDow(_ dow: Int, available: [Int], dowOffset: Int, hour: Int, minute: Int, day: Int, month: Int, year: Int, calendar: Calendar, cron: SwifCron) throws -> Date {
+        var minute = minute
+        var hour = hour
         let dowComponents = try findComponentsByDayOfWeek(dow, available: available, dowOffset: dowOffset, currentDay: day, currentMonth: month, year: year)
+        if dowComponents.day > day {
+            minute = cron.minutes[0]
+            hour = cron.hours[0]
+        }
         let componentsByDow = DateComponents(year: year + dowComponents.yearOffset, month: dowComponents.month, day: dowComponents.day, hour: hour, minute: minute, second: 0)
         guard let date = calendar.date(from: componentsByDow) else {
             throw SwifCronError(reason: "Unable to generate next date from components")

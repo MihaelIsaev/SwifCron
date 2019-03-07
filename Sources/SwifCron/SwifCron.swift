@@ -134,7 +134,8 @@ public struct SwifCron {
                                                                   day: currentDayOfMonth,
                                                                   month: currentMonth,
                                                                   year: currentYear,
-                                                                  calendar: calendar)
+                                                                  calendar: calendar,
+                                                                  cron: self)
         case .mixed:
             let nextDateByDow = try Helper.getNextDateByDow(currentDayOfWeek,
                                                                                         available: daysOfWeek,
@@ -144,7 +145,8 @@ public struct SwifCron {
                                                                                         day: currentDayOfMonth,
                                                                                         month: currentMonth,
                                                                                         year: currentYear,
-                                                                                        calendar: calendar)
+                                                                                        calendar: calendar,
+                                                                                        cron: self)
             let nextDateByDom = try Helper.getNextDateByDom(minute: nextMinute.value,
                                                                                         hour: nextHour.value,
                                                                                         day: nextDayOfMonth.value,
