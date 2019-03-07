@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'SwifCron'
-  s.version          = '1.0.0'
+  s.version          = '1.1.0'
   s.summary          = '⏱ An awesome and simple pure swift cron expressions parser and scheduler'
 
 # This description is used to generate tags and improve search results.

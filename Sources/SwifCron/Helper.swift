@@ -53,9 +53,9 @@ struct Helper {
     }
     
     /// Returns next available value from array
-    static func findNext(current: Int, from available: [Int], offset: Int, isMinute: Bool = false) throws -> (value: Int, offset: Int) {
+    static func findNext(current: Int, from available: [Int], offset: Int) throws -> (value: Int, offset: Int) {
         if let next = available.first(where: { $0 >= current + offset }) {
-            return (isMinute ? next + 1 : next, 0)
+            return (next, 0)
         }
         if let first = available.first {
             return (first, 1)

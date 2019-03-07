@@ -13,6 +13,8 @@ public struct SwifCron {
         case anyDayOfWeek, exactDayOfWeekButAnyDom, mixed
     }
     let mode: ExpressionMode
+    let anyMinute: Bool
+    let anyHour: Bool
     
     /// Parsed parts of cron expression
     let minutes, hours, daysOfMonth, months, daysOfWeek: [Int]
@@ -45,6 +47,9 @@ public struct SwifCron {
         } else {
             mode = .mixed
         }
+        
+        anyMinute = parts[0] == "*"
+        anyHour = parts[1] == "*"
         
         // Cron expression parsed values
         minutes = try ExpressionParser.parse(part: parts[0], .minutes)
@@ -81,14 +86,36 @@ public struct SwifCron {
         let currentYear = calendar.component(.year, from: date)
         
         // Looking for the right next date
-        let nextMinute = try Helper.findNext(current: currentMinute, from: minutes, offset: 0, isMinute: true)
-        let nextHour = try Helper.findNext(current: currentHour, from: hours, offset: nextMinute.offset)
+        var nextMinute = try Helper.findNext(current: currentMinute, from: minutes, offset: anyMinute ? 1 : 0)
+        if nextMinute.value == currentMinute {
+            nextMinute.value = nextMinute.value + 1
+        }
+        var nextHour = try Helper.findNext(current: currentHour, from: hours, offset: nextMinute.offset)
+        if nextHour.value - currentHour > 0 {
+            nextMinute.value = minutes[0]
+        }
         
         // Not every month contains 31 day, so we should exclude non-existing days
         let filteredDaysOfMonth = try Helper.filterDaysOfMonth(month: currentMonth, year: currentYear, days: daysOfMonth)
         
-        let nextDayOfMonth = try Helper.findNext(current: currentDayOfMonth, from: filteredDaysOfMonth, offset: nextHour.offset)
-        let nextMonth = try Helper.findNext(current: currentMonth, from: months, offset: nextDayOfMonth.offset)
+        var nextDayOfMonth = try Helper.findNext(current: currentDayOfMonth, from: filteredDaysOfMonth, offset: nextHour.offset)
+        var nextMonth = try Helper.findNext(current: currentMonth, from: months, offset: nextDayOfMonth.offset)
+        
+        if nextDayOfMonth.value - currentDayOfMonth > 0 {
+            nextMinute.value = minutes[0]
+            nextHour.value = hours[0]
+        }
+        if nextMonth.value - currentMonth > 0 {
+            nextMinute.value = minutes[0]
+            nextHour.value = hours[0]
+            nextDayOfMonth.value = daysOfMonth[0]
+        }
+        if nextMonth.offset > 0 {
+            nextMinute.value = minutes[0]
+            nextHour.value = hours[0]
+            nextDayOfMonth.value = daysOfMonth[0]
+            nextMonth.value = months[0]
+        }
         
         switch mode {
         case .anyDayOfWeek:
