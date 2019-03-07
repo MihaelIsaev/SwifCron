@@ -70,7 +70,7 @@ final class SwifCronTests: XCTestCase {
     func test8() {
         do {
             let nextDate = try SwifCron("0-1,3/2 * * * *").next(from: testDate)
-            XCTAssertEqual(String(describing: nextDate), "2019-03-06 20:42:00 +0000")
+            XCTAssertEqual(String(describing: nextDate), "2019-03-06 20:43:00 +0000")
         } catch {
             XCTFail(String(describing: error))
         }
@@ -211,6 +211,15 @@ final class SwifCronTests: XCTestCase {
             XCTFail(String(describing: error))
         }
     }
+    
+    func test23() {
+        do {
+            let nextDate = try SwifCron("*/2 * * * *").next(from: Date(timeIntervalSince1970: 1551922685))
+            XCTAssertEqual(String(describing: nextDate), "2019-03-07 01:40:00 +0000")
+        } catch {
+            XCTFail(String(describing: error))
+        }
+    }
 
     static var allTests = [
         ("test1", test1),
@@ -235,5 +244,6 @@ final class SwifCronTests: XCTestCase {
         ("test20", test20),
         ("test21", test21),
         ("test22", test22),
+        ("test23", test23),
     ]
 }

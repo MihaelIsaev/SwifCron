@@ -88,7 +88,11 @@ public struct SwifCron {
         // Looking for the right next date
         var nextMinute = try Helper.findNext(current: currentMinute, from: minutes, offset: anyMinute ? 1 : 0)
         if nextMinute.value == currentMinute {
-            nextMinute.value = nextMinute.value + 1
+            if anyMinute {
+                nextMinute.value = nextMinute.value + 1
+            } else {
+                nextMinute = try Helper.findNext(current: currentMinute, from: minutes, offset: 1)
+            }
         }
         var nextHour = try Helper.findNext(current: currentHour, from: hours, offset: nextMinute.offset)
         if nextHour.value - currentHour > 0 {
