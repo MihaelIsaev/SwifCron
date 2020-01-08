@@ -10,6 +10,7 @@
     <a href="https://cocoapods.org/pods/SwifCron">
         <img src="https://img.shields.io/cocoapods/v/SwifCron.svg" alt="Cocoapod">
     </a>
+    <img src="https://img.shields.io/github/workflow/status/MihaelIsaev/SwifCron/test" alt="Github Actions">
 </p>
 
 <br>
