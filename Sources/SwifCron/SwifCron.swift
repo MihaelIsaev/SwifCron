@@ -8,6 +8,9 @@
 import Foundation
 
 public struct SwifCron {
+    /// String expression
+    public let expression: String
+    
     /// Internal expression mode
     enum ExpressionMode {
         case anyDayOfWeek, exactDayOfWeekButAnyDom, mixed
@@ -35,6 +38,7 @@ public struct SwifCron {
         - /:(slash) for step values
      */
     public init(_ expression: String) throws {
+        self.expression = expression
         let parts = expression.components(separatedBy: " ")
         guard parts.count == 5 else {
             throw SwifCronError(reason: "Cron string should contain 5 parts separated by space")
@@ -159,5 +163,11 @@ public struct SwifCron {
                                                                                         calendar: calendar)
             return nextDateByDow < nextDateByDom ? nextDateByDow : nextDateByDom
         }
+    }
+}
+
+extension SwifCron: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(expression)
     }
 }
