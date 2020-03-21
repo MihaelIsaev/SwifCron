@@ -12,7 +12,7 @@
     </a>
     <img src="https://img.shields.io/github/workflow/status/MihaelIsaev/SwifCron/test" alt="Github Actions">
 </p>
-
+<p align="center"><a href="https://discord.gg/q5wCPYv">SWIFT.STREAM COMMUNITY IN DISCORD</a></p>
 <br>
 
 ### Don't forget to support the lib by giving a ⭐️
