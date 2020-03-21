@@ -11,8 +11,11 @@
         <img src="https://img.shields.io/cocoapods/v/SwifCron.svg" alt="Cocoapod">
     </a>
     <img src="https://img.shields.io/github/workflow/status/MihaelIsaev/SwifCron/test" alt="Github Actions">
+    <a href="https://discord.gg/q5wCPYv">
+        <img src="https://img.shields.io/badge/CLICK_HERE_TO_DISCUSS_THIS_LIB-SWIFT.STREAM-FD6F32.svg" alt="Swift.Stream">
+    </a>
 </p>
-<p align="center"><a href="https://discord.gg/q5wCPYv">SWIFT.STREAM COMMUNITY IN DISCORD</a></p>
+
 <br>
 
 ### Don't forget to support the lib by giving a ⭐️
