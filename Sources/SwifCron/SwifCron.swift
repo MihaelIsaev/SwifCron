@@ -111,7 +111,7 @@ public struct SwifCron {
         
         // additional check for minute. If current time is 20:10:05, next will be 20:10:06, not 20:11:06
         var nextMinute = try Helper.findNext(current: currentMinute, from: minutes, offset: anyMinute && !sixValues ? 1 : 0)
-        print(nextSecond, nextMinute)
+
         if !sixValues || nextSecond.value == 0 {
             if nextMinute.value == currentMinute {
                 if anyMinute {
@@ -121,7 +121,7 @@ public struct SwifCron {
                 }
             }
         }
-        print(nextMinute)
+
         var nextHour = try Helper.findNext(current: currentHour, from: hours, offset: nextMinute.offset)
         if nextHour.value - currentHour > 0 {
             nextMinute.value = minutes[0]
