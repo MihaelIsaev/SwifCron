@@ -106,8 +106,7 @@ public struct SwifCron {
         let currentYear = calendar.component(.year, from: date)
         
         // Looking for the right next date
-        var nextSecond = try Helper.findNext(current: currentSecond, from: seconds, offset: anySecond ? 1 : 0)
-        
+        var nextSecond = try Helper.findNext(current: currentSecond, from: seconds, offset: sixValues ? 1 : 0)
         
         // additional check for minute. If current time is 20:10:05, next will be 20:10:06, not 20:11:06
         var nextMinute = try Helper.findNext(current: currentMinute, from: minutes, offset: anyMinute && !sixValues ? 1 : 0)
