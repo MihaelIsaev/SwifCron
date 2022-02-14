@@ -47,10 +47,12 @@ In your target's dependencies add `"SwifCron"` e.g. like this:
 import SwifCron
 
 do {
-    let cron = try SwifCron("* * * * *")
+    let everyMinuteCron = try SwifCron("* * * * *")
+    let everySecondCron = try SwifCron("* * * * * *")
 
     //for getting next date related to current date
-    let nextDate = try cron.next()
+    let nextMinuteDate = try everyMinuteCron.next()
+    let nextSecondDate = try everyMinuteCron.next()
 
     //for getting next date related to custom date
     let nextDate = try cron.next(from: Date())
