@@ -61,6 +61,12 @@ do {
 
 ## Limitations
 
+This library support both 5 or 6 parts expressions.
+
+With 6 parts format is ```Second``` ```Minute``` ```Hour``` ```Day of month``` ```Month``` ```Day of week```
+
+For creating expressions you can use this [5-parts](crontab.guru) or [6-parts (year not supported)](https://www.freeformatter.com/cron-expression-generator-quartz.html) generator
+
 I use [CrontabGuru](https://crontab.guru/) as a reference
 
 So you could parse any expression which consists of digits with `*` `,` `/` and `-` symbols
