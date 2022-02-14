@@ -47,7 +47,7 @@ public struct SwifCron {
         
         // add new seconds parameter (Quartz cron) but leave backward compatibility with UNIX cron
         guard parts.count == 5 || parts.count == 6 else {
-            throw SwifCronError(reason: "Cron string should contain 5 parts separated by space")
+            throw SwifCronError(reason: "Cron string should contain 5 or 6 parts separated by space")
         }
         var offset = 0
         if parts.count == 6 {
