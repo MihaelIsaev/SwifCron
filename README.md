@@ -34,7 +34,7 @@ pod 'SwifCron', '~> 1.3.0'
 ### Swift Package Manager
 
 ```swift
-.package(url: "https://github.com/MihaelIsaev/SwifCron.git", from:"1.3.0")
+.package(url: "https://github.com/MihaelIsaev/SwifCron.git", from: "2.0.0")
 ```
 In your target's dependencies add `"SwifCron"` e.g. like this:
 ```swift
