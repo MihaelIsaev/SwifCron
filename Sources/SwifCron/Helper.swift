@@ -9,8 +9,8 @@ import Foundation
 
 struct Helper {
     /// Returns a next day by provided minute, hour, minutem day, month, year, calendar
-    static func getNextDateByDom(minute: Int, hour: Int, day: Int, month: Int, year: Int, calendar: Calendar) throws -> Date {
-        let componentsByDom = DateComponents(year: year, month: month, day: day, hour: hour, minute: minute, second: 0)
+    static func getNextDateByDom(second: Int, minute: Int, hour: Int, day: Int, month: Int, year: Int, calendar: Calendar) throws -> Date {
+        let componentsByDom = DateComponents(year: year, month: month, day: day, hour: hour, minute: minute, second: second)
         guard let nextDateByDayOfMonth = calendar.date(from: componentsByDom) else {
             throw SwifCronError(reason: "Unable to generate next date from components")
         }
@@ -18,7 +18,7 @@ struct Helper {
     }
     
     /// Returns a next day by provided day of week, offset, minute, hour, minutem day, month, year, calendar
-    static func getNextDateByDow(_ dow: Int, available: [Int], dowOffset: Int, hour: Int, minute: Int, day: Int, month: Int, year: Int, calendar: Calendar, cron: SwifCron) throws -> Date {
+    static func getNextDateByDow(_ dow: Int, available: [Int], dowOffset: Int, second: Int, minute: Int, hour: Int, day: Int, month: Int, year: Int, calendar: Calendar, cron: SwifCron) throws -> Date {
         var minute = minute
         var hour = hour
         let dowComponents = try findComponentsByDayOfWeek(dow, available: available, dowOffset: dowOffset, currentDay: day, currentMonth: month, year: year)

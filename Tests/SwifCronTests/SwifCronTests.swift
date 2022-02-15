@@ -220,6 +220,33 @@ final class SwifCronTests: XCTestCase {
             XCTFail(String(describing: error))
         }
     }
+    
+    func test24() {
+        do {
+            let nextDate = try SwifCron("* * * * * *").next(from: testDate)
+            XCTAssertEqual(String(describing: nextDate), "2019-03-06 20:41:36 +0000")
+        } catch {
+            XCTFail(String(describing: error))
+        }
+    }
+    
+    func test25() {
+        do {
+            let nextDate = try SwifCron("*/2 * * * * *").next(from: testDate)
+            XCTAssertEqual(String(describing: nextDate), "2019-03-06 20:41:36 +0000")
+        } catch {
+            XCTFail(String(describing: error))
+        }
+    }
+    
+    func test26() {
+        do {
+            let nextDate = try SwifCron("*/30 * * * * *").next(from: testDate)
+            XCTAssertEqual(String(describing: nextDate), "2019-03-06 20:42:00 +0000")
+        } catch {
+            XCTFail(String(describing: error))
+        }
+    }
 
     static var allTests = [
         ("test1", test1),
@@ -245,5 +272,8 @@ final class SwifCronTests: XCTestCase {
         ("test21", test21),
         ("test22", test22),
         ("test23", test23),
+        ("test24", test24),
+        ("test25", test25),
+        ("test26", test26)
     ]
 }

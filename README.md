@@ -28,13 +28,13 @@ SwifCron is available through [CocoaPods](https://cocoapods.org)
 
 To install it, simply add the following line in your Podfile:
 ```ruby
-pod 'SwifCron', '~> 1.3.0'
+pod 'SwifCron', '~> 2.0.0'
 ```
 
 ### Swift Package Manager
 
 ```swift
-.package(url: "https://github.com/MihaelIsaev/SwifCron.git", from:"1.3.0")
+.package(url: "https://github.com/MihaelIsaev/SwifCron.git", from: "2.0.0")
 ```
 In your target's dependencies add `"SwifCron"` e.g. like this:
 ```swift
@@ -47,10 +47,12 @@ In your target's dependencies add `"SwifCron"` e.g. like this:
 import SwifCron
 
 do {
-    let cron = try SwifCron("* * * * *")
+    let everyMinuteCron = try SwifCron("* * * * *")
+    let everySecondCron = try SwifCron("* * * * * *")
 
     //for getting next date related to current date
-    let nextDate = try cron.next()
+    let nextMinuteDate = try everyMinuteCron.next()
+    let nextSecondDate = try everyMinuteCron.next()
 
     //for getting next date related to custom date
     let nextDate = try cron.next(from: Date())
@@ -60,6 +62,12 @@ do {
 ```
 
 ## Limitations
+
+This library support both 5 or 6 parts expressions.
+
+With 6 parts format is ```Second``` ```Minute``` ```Hour``` ```Day of month``` ```Month``` ```Day of week```
+
+For creating expressions you can use this [5-parts](https://crontab.guru) or [6-parts (year not supported)](https://www.freeformatter.com/cron-expression-generator-quartz.html) generator
 
 I use [CrontabGuru](https://crontab.guru/) as a reference
 

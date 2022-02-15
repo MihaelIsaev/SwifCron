@@ -16,51 +16,66 @@ public struct SwifCron {
         case anyDayOfWeek, exactDayOfWeekButAnyDom, mixed
     }
     let mode: ExpressionMode
+    
+    let sixValues: Bool
+    let anySecond: Bool
     let anyMinute: Bool
     let anyHour: Bool
     
     /// Parsed parts of cron expression
-    let minutes, hours, daysOfMonth, months, daysOfWeek: [Int]
+    let seconds, minutes, hours, daysOfMonth, months, daysOfWeek: [Int]
     
     /**
      Supports only digit values yet
      - parameters:
-       - minute: expression string
-       - hour: expression string
-       - dayOfMonth: expression string
-       - month: expression string (doesn't suppoer name of month, only digits)
-       - dayOfWeek: expression string (sunday is 0, doesn't support name of day, so use only digits)
+     - second: expression string, default - 0
+     - minute: expression string
+     - hour: expression string
+     - dayOfMonth: expression string
+     - month: expression string (doesn't suppoer name of month, only digits)
+     - dayOfWeek: expression string (sunday is 0, doesn't support name of day, so use only digits)
      
      - supported values:
-        - *: for any value
-        - -: to set periods like `1-10`
-        - ,: (comma) value list separator
-        - /:(slash) for step values
+     - *: for any value
+     - -: to set periods like `1-10`
+     - ,: (comma) value list separator
+     - /:(slash) for step values
      */
     public init(_ expression: String) throws {
         self.expression = expression
         let parts = expression.components(separatedBy: " ")
-        guard parts.count == 5 else {
-            throw SwifCronError(reason: "Cron string should contain 5 parts separated by space")
+        
+        // add new seconds parameter (Quartz cron) but leave backward compatibility with UNIX cron
+        guard parts.count == 5 || parts.count == 6 else {
+            throw SwifCronError(reason: "Cron string should contain 5 or 6 parts separated by space")
+        }
+        var offset = 0
+        if parts.count == 6 {
+            offset = 1
+            sixValues = true
+        } else {
+            sixValues = false
         }
         
-        if parts[4] == "*" {
+        if parts[offset + 4] == "*" {
             mode = .anyDayOfWeek
-        } else if parts[2] == "*" && parts[3] == "*" && parts[4] != "*" {
+        } else if parts[offset + 2] == "*" && parts[offset + 3] == "*" && parts[offset + 4] != "*" {
             mode = .exactDayOfWeekButAnyDom
         } else {
             mode = .mixed
         }
         
-        anyMinute = parts[0] == "*"
-        anyHour = parts[1] == "*"
+        anySecond = offset == 0 ? false : parts[0] == "*"
+        anyMinute = parts[offset + 0] == "*"
+        anyHour = parts[offset + 1] == "*"
         
         // Cron expression parsed values
-        minutes = try ExpressionParser.parse(part: parts[0], .minutes)
-        hours = try ExpressionParser.parse(part: parts[1], .hours)
-        daysOfMonth = try ExpressionParser.parse(part: parts[2], .daysOfMonth)
-        months = try ExpressionParser.parse(part: parts[3], .months)
-        daysOfWeek = try ExpressionParser.parse(part: parts[4], .daysOfWeek)
+        seconds = offset == 0 ? [0] : try ExpressionParser.parse(part: parts[0], .seconds)
+        minutes = try ExpressionParser.parse(part: parts[offset + 0], .minutes)
+        hours = try ExpressionParser.parse(part: parts[offset + 1], .hours)
+        daysOfMonth = try ExpressionParser.parse(part: parts[offset + 2], .daysOfMonth)
+        months = try ExpressionParser.parse(part: parts[offset + 3], .months)
+        daysOfWeek = try ExpressionParser.parse(part: parts[offset + 4], .daysOfWeek)
     }
     
     /* Returns a next date based on cron string expression
@@ -82,6 +97,7 @@ public struct SwifCron {
         calendar.timeZone = timeZone
         
         // Value for `from` date
+        let currentSecond = calendar.component(.second, from: date)
         let currentMinute = calendar.component(.minute, from: date)
         let currentHour = calendar.component(.hour, from: date)
         let currentDayOfMonth = calendar.component(.day, from: date)
@@ -90,14 +106,21 @@ public struct SwifCron {
         let currentYear = calendar.component(.year, from: date)
         
         // Looking for the right next date
-        var nextMinute = try Helper.findNext(current: currentMinute, from: minutes, offset: anyMinute ? 1 : 0)
-        if nextMinute.value == currentMinute {
-            if anyMinute {
-                nextMinute.value = nextMinute.value + 1
-            } else {
-                nextMinute = try Helper.findNext(current: currentMinute, from: minutes, offset: 1)
+        var nextSecond = try Helper.findNext(current: currentSecond, from: seconds, offset: sixValues ? 1 : 0)
+        
+        // additional check for minute. If current time is 20:10:05, next will be 20:10:06, not 20:11:06
+        var nextMinute = try Helper.findNext(current: currentMinute, from: minutes, offset: anyMinute && !sixValues ? 1 : 0)
+
+        if !sixValues || nextSecond.value == 0 {
+            if nextMinute.value == currentMinute {
+                if anyMinute {
+                    nextMinute.value = nextMinute.value + 1
+                } else {
+                    nextMinute = try Helper.findNext(current: currentMinute, from: minutes, offset: 1)
+                }
             }
         }
+
         var nextHour = try Helper.findNext(current: currentHour, from: hours, offset: nextMinute.offset)
         if nextHour.value - currentHour > 0 {
             nextMinute.value = minutes[0]
@@ -110,15 +133,18 @@ public struct SwifCron {
         var nextMonth = try Helper.findNext(current: currentMonth, from: months, offset: nextDayOfMonth.offset)
         
         if nextDayOfMonth.value - currentDayOfMonth > 0 {
+            nextSecond.value = seconds[0]
             nextMinute.value = minutes[0]
             nextHour.value = hours[0]
         }
         if nextMonth.value - currentMonth > 0 {
+            nextSecond.value = seconds[0]
             nextMinute.value = minutes[0]
             nextHour.value = hours[0]
             nextDayOfMonth.value = daysOfMonth[0]
         }
         if nextMonth.offset > 0 {
+            nextSecond.value = seconds[0]
             nextMinute.value = minutes[0]
             nextHour.value = hours[0]
             nextDayOfMonth.value = daysOfMonth[0]
@@ -127,40 +153,43 @@ public struct SwifCron {
         
         switch mode {
         case .anyDayOfWeek:
-            return try Helper.getNextDateByDom(minute: nextMinute.value,
-                                                                  hour: nextHour.value,
-                                                                  day: nextDayOfMonth.value,
-                                                                  month: nextMonth.value,
-                                                                  year: currentYear + nextMonth.offset,
-                                                                  calendar: calendar)
+            return try Helper.getNextDateByDom(second: nextSecond.value,
+                                               minute: nextMinute.value,
+                                               hour: nextHour.value,
+                                               day: nextDayOfMonth.value,
+                                               month: nextMonth.value,
+                                               year: currentYear + nextMonth.offset,
+                                               calendar: calendar)
         case .exactDayOfWeekButAnyDom:
             return try Helper.getNextDateByDow(currentDayOfWeek,
-                                                                  available: daysOfWeek,
-                                                                  dowOffset: nextHour.offset,
-                                                                  hour: nextHour.value,
-                                                                  minute: nextMinute.value,
-                                                                  day: currentDayOfMonth,
-                                                                  month: currentMonth,
-                                                                  year: currentYear,
-                                                                  calendar: calendar,
-                                                                  cron: self)
+                                               available: daysOfWeek,
+                                               dowOffset: nextHour.offset,
+                                               second: nextSecond.value,
+                                               minute: nextMinute.value,
+                                               hour: nextHour.value,
+                                               day: currentDayOfMonth,
+                                               month: currentMonth,
+                                               year: currentYear,
+                                               calendar: calendar,
+                                               cron: self)
         case .mixed:
             let nextDateByDow = try Helper.getNextDateByDow(currentDayOfWeek,
-                                                                                        available: daysOfWeek,
-                                                                                        dowOffset: nextHour.offset,
-                                                                                        hour: nextHour.value,
-                                                                                        minute: nextMinute.value,
-                                                                                        day: currentDayOfMonth,
-                                                                                        month: currentMonth,
-                                                                                        year: currentYear,
-                                                                                        calendar: calendar,
-                                                                                        cron: self)
-            let nextDateByDom = try Helper.getNextDateByDom(minute: nextMinute.value,
-                                                                                        hour: nextHour.value,
-                                                                                        day: nextDayOfMonth.value,
-                                                                                        month: nextMonth.value,
-                                                                                        year: currentYear + nextMonth.offset,
-                                                                                        calendar: calendar)
+                                                            available: daysOfWeek,
+                                                            dowOffset: nextHour.offset,
+                                                            second: nextSecond.value,
+                                                            minute: nextMinute.value, hour: nextHour.value,
+                                                            day: currentDayOfMonth,
+                                                            month: currentMonth,
+                                                            year: currentYear,
+                                                            calendar: calendar,
+                                                            cron: self)
+            let nextDateByDom = try Helper.getNextDateByDom(second: nextSecond.value,
+                                                            minute: nextMinute.value,
+                                                            hour: nextHour.value,
+                                                            day: nextDayOfMonth.value,
+                                                            month: nextMonth.value,
+                                                            year: currentYear + nextMonth.offset,
+                                                            calendar: calendar)
             return nextDateByDow < nextDateByDom ? nextDateByDow : nextDateByDom
         }
     }

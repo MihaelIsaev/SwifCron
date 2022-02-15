@@ -9,10 +9,11 @@ import Foundation
 
 struct ExpressionParser {
     enum PartType {
-        case minutes, hours, daysOfMonth, months, daysOfWeek
+        case seconds, minutes, hours, daysOfMonth, months, daysOfWeek
         
         var values: [Int] {
             switch self {
+            case .seconds: return Array(0...59)
             case .minutes: return Array(0...59)
             case .hours: return Array(0...23)
             case .daysOfMonth: return Array(1...31)
