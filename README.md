@@ -28,7 +28,7 @@ SwifCron is available through [CocoaPods](https://cocoapods.org)
 
 To install it, simply add the following line in your Podfile:
 ```ruby
-pod 'SwifCron', '~> 1.3.0'
+pod 'SwifCron', '~> 2.0.0'
 ```
 
 ### Swift Package Manager
