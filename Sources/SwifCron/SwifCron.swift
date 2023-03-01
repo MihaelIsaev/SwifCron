@@ -88,13 +88,10 @@ public struct SwifCron {
      *
      * Supports only digit values yet
      **/
-    public func next(from date: Date = Date()) throws -> Date {
+    public func next(from date: Date = Date(), timeZone: TimeZone? = nil) throws -> Date {
         // Calendar with UTC-0 time zone
         var calendar = Calendar(identifier: .gregorian)
-        guard let timeZone = TimeZone(secondsFromGMT: 0) else {
-            throw SwifCronError(reason: "Unable to get UTC+0 time zone")
-        }
-        calendar.timeZone = timeZone
+        calendar.timeZone = timeZone ?? .gmt
         
         // Value for `from` date
         let currentSecond = calendar.component(.second, from: date)
