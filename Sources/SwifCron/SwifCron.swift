@@ -91,7 +91,7 @@ public struct SwifCron {
     public func next(from date: Date = Date(), timeZone: TimeZone? = nil) throws -> Date {
         // Calendar with UTC-0 time zone
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = timeZone ?? .gmt
+        calendar.timeZone = timeZone ?? TimeZone(secondsFromGMT: 0)!
         
         // Value for `from` date
         let currentSecond = calendar.component(.second, from: date)
